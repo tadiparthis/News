@@ -72,8 +72,9 @@ QUESTIONS = [
 ]
 
 # GIF URLs
-SUCCESS_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW43ZGl6ZTh3OXBmbTdrZnkyN3p1czV3OWlqaTRjcXRiYnQzbGF0ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/artj92V8o75VPL7AeQ/giphy.gif"
-THINKING_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHBsZ3Uxa3lseGJnYThmb2QzeGs5YXdtYXRyNnBucnlwbHRmNzByYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif"
+SUCCESS_GIF = SUCCESS_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTYyeGppNnN3ODdmZjNmNDBucmdzZGVwNjliemZuaHBrcmd3dTZ6NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/111ebonMs903CA/giphy.gif"
+THINKING_GIF = https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnE2Y3o5ZGZ0MWIxcTRlOHRwMXlhNHJqcnkyNXVjcXBpdnNzbzBzayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/d22UJ47yv7UK4/giphy.gif"
+
 
 # --- INITIALIZE APP STATE ---
 if "step" not in st.session_state:
