@@ -363,10 +363,10 @@ else:
             <span style="font-size: 18px; color: #111111; font-weight: bold;">
                 You are going to be <b>Great GrandPa & Great GrandMa <br>
                 <b>GrandPa & GrandMa / ATTA & MAMU </b>! 
-                <br>❤️PINNI -MS <b>vPINNI -MBA❤️
+                <br>❤️PINNI -MS <b>PINNI -MBA❤️
             </span><br>
             <span style="font-size: 15px; color: #222222; font-weight: 600;">
-                Expected Arrival: [Insert Due Date Here]
+                Expected Arrival: March, 2027
             </span>
         </div>
     """, unsafe_allow_html=True)
