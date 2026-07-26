@@ -72,8 +72,8 @@ QUESTIONS = [
 ]
 
 # GIF URLs
-SUCCESS_GIF = SUCCESS_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTYyeGppNnN3ODdmZjNmNDBucmdzZGVwNjliemZuaHBrcmd3dTZ6NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/111ebonMs903CA/giphy.gif"
-THINKING_GIF = https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnE2Y3o5ZGZ0MWIxcTRlOHRwMXlhNHJqcnkyNXVjcXBpdnNzbzBzayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/d22UJ47yv7UK4/giphy.gif"
+SUCCESS_GIF  = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTYyeGppNnN3ODdmZjNmNDBucmdzZGVwNjliemZuaHBrcmd3dTZ6NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/111ebonMs903CA/giphy.gif"
+THINKING_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnE2Y3o5ZGZ0MWIxcTRlOHRwMXlhNHJqcnkyNXVjcXBpdnNzbzBzayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/d22UJ47yv7UK4/giphy.gif"
 
 
 # --- INITIALIZE APP STATE ---
