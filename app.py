@@ -9,18 +9,18 @@ st.set_page_config(page_title="The Family Mystery Challenge", page_icon="🎁", 
 # --- MULTIPLE CHOICE QUESTIONS SETUP ---
 QUESTIONS = [
     {
-        "q": "Question 1: In a Nuclear Power Plant, what type of reaction occurs to split atoms?",
+        "q": "Question 1: Sun brings its energy through one of the nuclear processes?",
         "options": ["Nuclear Fission", "Nuclear Fusion", "Nuclear Fashion", "Nuclear Focus"],
-        "correct_options": ["Nuclear Fission"],
+        "correct_options": ["Nuclear Fusion"],
         "hint": "It splits atoms to generate energy!",
-        "watermark": "Nibling"
+        "watermark": "Grand Dad"
     },
     {
         "q": "Question 2: If you can crack this formula, you have a big clue hidden in the options! What is (a+b)²?",
         "options": ["a^2+b^2+2ab", "ay+by", "ba+by+2ab", "ba+ay+4ab"],
         "correct_options": ["a^2+b^2+2ab"],
         "hint": "A squared plus B squared plus 2AB!",
-        "watermark": "Mom"
+        "watermark": "Grand Ma"
     },
     {
         "q": "Question 3: At what high sound frequencies can dogs hear that humans cannot?",
@@ -34,7 +34,7 @@ QUESTIONS = [
         "options": ["Moses", "David", "Solomon", "Noah"],
         "correct_options": ["Moses"],
         "hint": "He grew up to lead his people!",
-        "watermark": "Nani"
+        "watermark": "Nibling"
     },
     {
         "q": "Question 5: In Genesis 1:28, God blessed mankind and commanded them to do what?",
@@ -63,7 +63,7 @@ QUESTIONS = [
         "watermark": "Granddaughter"
     },
     {
-        "q": "Question 8 (FINAL): If you remember all the answers, what does it all boil down to?",
+        "q": "Question 8 (FINAL): If you remember all the answers, choose an option that summarizes the answer?",
         "options": ["Increasing", "Multiply", "A Ba Be", "Unto us... WE ARE HAVING A BABY!"],
         "correct_options": ["Increasing", "Multiply", "A Ba Be", "Unto us... WE ARE HAVING A BABY!"],
         "hint": "Pick any option to see the big reveal!",
