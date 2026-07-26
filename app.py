@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import time
-from PIL import Image, ImageFilter
+from PIL import Image, ImageEnhance
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="The Family Mystery Challenge", page_icon="🎁", layout="centered")
@@ -74,6 +74,18 @@ QUESTIONS = [
 # GIF URLs
 SUCCESS_GIF  = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTAxOHB2b2VycTZwbW9hcXk1cGwyeW56eGdodW5wa2FoOXl6dzB4eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DffShiJ47fPqM/giphy.gif"
 THINKING_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTdwOHM4dHJmZmVxNnJmeGtnemQ3aDJocGh2Z2N5OTU3NzhhM2FnaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eKrgVyZ7zLvJrgZNZn/giphy.gif"
+
+# Palette of mask colors that cycle through the levels
+MASK_COLORS = [
+    (220, 50, 47),   # Deep Crimson
+    (211, 84, 0),    # Burnt Orange
+    (241, 196, 15),  # Vibrant Gold
+    (39, 174, 96),   # Emerald Green
+    (41, 128, 185),  # Ocean Blue
+    (142, 68, 173),  # Deep Purple
+    (231, 76, 60),   # Coral Red
+    (22, 160, 133)   # Teal
+]
 
 # --- INITIALIZE APP STATE ---
 if "step" not in st.session_state:
@@ -200,16 +212,31 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# Function to dynamically blur ultrasound image based on progress
-def get_focused_ultrasound(step, max_steps):
+# Function to dynamically mask ultrasound image with fading color overlays
+def get_masked_ultrasound(step, max_steps):
     img_path = "ultrasound.jpg"
     if os.path.exists(img_path):
         try:
-            image = Image.open(img_path).convert("RGB")
-            blur_radius = max(0, (max_steps - step) * 3.5)
-            if blur_radius > 0:
-                return image.filter(ImageFilter.GaussianBlur(blur_radius))
-            return image
+            image = Image.open(img_path).convert("RGBA")
+            
+            # If we reached the final step, show true 100% clear unmasked image
+            if step >= max_steps:
+                return image.convert("RGB")
+            
+            # Mask Opacity decreases gradually from 0.90 (90%) down to 0%
+            remaining_steps = max_steps - step
+            opacity = min(0.92, max(0.1, (remaining_steps / max_steps) * 0.92))
+            
+            # Pick mask color for current question
+            color_rgb = MASK_COLORS[step % len(MASK_COLORS)]
+            
+            # Create color overlay layer
+            overlay = Image.new("RGBA", image.size, color_rgb + (int(255 * opacity),))
+            
+            # Blend original image with color mask
+            masked_image = Image.alpha_composite(image, overlay)
+            return masked_image.convert("RGB")
+            
         except Exception as e:
             st.error(f"Error loading image: {e}")
             return None
@@ -258,11 +285,12 @@ if current_step < len(QUESTIONS):
         st.session_state.step += 1
         st.rerun()
 
-    # Show gradually focusing image preview below
-    focused_img = get_focused_ultrasound(current_step, len(QUESTIONS))
-    if focused_img:
+    # Show color-masked image preview below
+    masked_img = get_masked_ultrasound(current_step, len(QUESTIONS))
+    if masked_img:
+        fade_pct = (current_step / len(QUESTIONS)) * 100
         st.write("### 🔍 Mystery Preview:")
-        st.image(focused_img, caption=f"Focus Level: {(current_step/len(QUESTIONS))*100:.0f}%", use_container_width=True)
+        st.image(masked_img, caption=f"Color Mask Faded: {fade_pct:.0f}% Revealed", use_container_width=True)
     else:
         st.warning("⚠️ Please place your 'ultrasound.jpg' file in the app folder to display the reveal picture.")
 
@@ -273,27 +301,26 @@ else:
     
     AUDIO_URL = "https://raw.githubusercontent.com/tadiparthis/News/main/thank_you_lord.mp3"
     
-    # SINGLE CLEAN AUDIO PLAYER (Prevents double audio playing)
+    # SINGLE CLEAN AUDIO PLAYER
     st.audio(AUDIO_URL, format="audio/mp3", start_time=52, autoplay=True)
     
     st.markdown("""
         <div class="big-announcement">
-            🎉  WE ARE HAVING A BABY! 👶<br><br>
+            🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br><br>
             <span style="font-size: 21px; color: #111111; font-weight: bold;">
-                You are going to be <b>Great GrandPa & Great GrandMa / NANA & NANI/ </b>! ❤️
-                ATTA & MAMU / GrandMa & GrandPa / MS - ATTA & MBA- ATTA / </b>! ❤️
+                You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
             </span><br><br>
             <span style="font-size: 18px; color: #222222; font-weight: 600;">
-                Expected Arrival: March, 2027
+                Expected Arrival: [Insert Due Date Here]
             </span>
         </div>
     """, unsafe_allow_html=True)
     
     st.write("")
-    # Display 100% crystal clear ultrasound photo full width
-    final_img = get_focused_ultrasound(len(QUESTIONS), len(QUESTIONS))
+    # Display 100% unmasked crystal clear ultrasound photo full width
+    final_img = get_masked_ultrasound(len(QUESTIONS), len(QUESTIONS))
     if final_img:
-        st.image(final_img, caption="100% Focused: Our Very First Photo! ❤️", use_container_width=True)
+        st.image(final_img, caption="100% Unmasked: Our Very First Photo! ❤️", use_container_width=True)
     else:
         st.warning("⚠️ Make sure 'ultrasound.jpg' is located in the same directory as this script.")
         
