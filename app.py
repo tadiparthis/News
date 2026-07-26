@@ -75,7 +75,6 @@ QUESTIONS = [
 SUCCESS_GIF  = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTAxOHB2b2VycTZwbW9hcXk1cGwyeW56eGdodW5wa2FoOXl6dzB4eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DffShiJ47fPqM/giphy.gif"
 THINKING_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTdwOHM4dHJmZmVxNnJmeGtnemQ3aDJocGh2Z2N5OTU3NzhhM2FnaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eKrgVyZ7zLvJrgZNZn/giphy.gif"
 
-
 # --- INITIALIZE APP STATE ---
 if "step" not in st.session_state:
     st.session_state.step = 0
@@ -87,7 +86,7 @@ current_step = st.session_state.step
 # Determine current watermark text
 current_watermark = QUESTIONS[current_step]["watermark"] if current_step < len(QUESTIONS) else "GRANDCHILD!"
 
-# --- INJECT CUSTOM STYLING (DARKER & BIGGER FONTS, WHITE BUTTON) ---
+# --- INJECT CUSTOM STYLING ---
 st.markdown(f"""
     <style>
     /* High contrast black text globally */
@@ -116,42 +115,43 @@ st.markdown(f"""
         z-index: 0;
     }}
     
-    /* Make Question Header Large & Bold */
+    /* Question Header Size (Reduced down to 32px) */
     .question-title {{
-        font-size: 34px !important;
+        font-size: 32px !important;
         font-weight: 800 !important;
         color: #000000 !important;
-        margin-bottom: 15px;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }}
     
-    /* Make Radio Options Large & Easy to Read */
+    /* Radio Options (Reduced down to 27px) */
     .stRadio label {{
-        font-size: 30px !important;
+        font-size: 27px !important;
         font-weight: 700 !important;
         color: #000000 !important;
-        padding: 6px 0px;
+        padding: 4px 0px;
     }}
 
     .stRadio p {{
-        font-size: 30px !important;
+        font-size: 27px !important;
         font-weight: 700 !important;
         color: #000000 !important;
     }}
     
-    /* FORCE SUBMIT BUTTON TO STAY PURE WHITE WITH BLACK TEXT AT ALL TIMES */
+    /* SUBMIT BUTTON (Reduced down to 24px font size & reduced padding) */
     .stButton > button,
     div[data-testid="stFormSubmitButton"] > button,
     div[data-testid="stFormSubmitButton"] button p {{
         background-color: #ffffff !important;
         background: #ffffff !important;
         color: #000000 !important;
-        font-size: 28px !important;
+        font-size: 24px !important;
         font-weight: 800 !important;
-        border-radius: 12px !important;
-        padding: 12px 28px !important;
+        border-radius: 10px !important;
+        padding: 8px 20px !important;
         width: 100% !important;
         border: 3px solid #000000 !important;
-        box-shadow: 2px 4px 8px rgba(0,0,0,0.15) !important;
+        box-shadow: 2px 3px 6px rgba(0,0,0,0.15) !important;
     }}
     
     /* Keep white background on hover, focus, or active click */
@@ -167,14 +167,26 @@ st.markdown(f"""
         border-color: #000000 !important;
     }}
     
+    /* Tighten white space around headers & dividers */
+    .stMarkdown {{
+        margin-bottom: -10px;
+    }}
+    
+    /* Image full container responsiveness */
+    [data-testid="stImage"] img {{
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 10px;
+    }}
+    
     /* Announcement Box */
     .big-announcement {{
-        font-size: 32px;
+        font-size: 29px;
         font-weight: bold;
         color: #d90429 !important;
         text-align: center;
         border: 4px dashed #d90429;
-        padding: 25px;
+        padding: 20px;
         border-radius: 15px;
         background-color: #fff0f3;
     }}
@@ -192,10 +204,9 @@ def get_focused_ultrasound(step, max_steps):
         return image
     return None
 
-# --- GUI HEADER ---
+# --- GUI HEADER (Tightened spacing) ---
 st.title("🧩 The Family Mystery Challenge")
-st.write("Solve the riddles to reveal the secret image!")
-st.write("---")
+st.markdown("<p style='margin-bottom: -5px; font-size: 18px;'>Solve the riddles to reveal the secret image!</p>", unsafe_allow_html=True)
 
 # --- GAME LOGIC ---
 if current_step < len(QUESTIONS):
@@ -204,7 +215,7 @@ if current_step < len(QUESTIONS):
     st.progress(progress)
     st.caption(f"Progress: Level {current_step + 1} of {len(QUESTIONS)}")
 
-    # Display Current Question (Extra Large Font)
+    # Display Current Question
     q_data = QUESTIONS[current_step]
     st.markdown(f'<div class="question-title">{q_data["q"]}</div>', unsafe_allow_html=True)
     
@@ -240,7 +251,7 @@ if current_step < len(QUESTIONS):
     focused_img = get_focused_ultrasound(current_step, len(QUESTIONS))
     if focused_img:
         st.write("### 🔍 Mystery Preview:")
-        st.image(focused_img, caption=f"Focus Level: {(current_step/len(QUESTIONS))*100:.0f}%", width=350)
+        st.image(focused_img, caption=f"Focus Level: {(current_step/len(QUESTIONS))*100:.0f}%", use_container_width=True)
 
 # --- FINAL REVEAL SCREEN ---
 else:
@@ -249,27 +260,54 @@ else:
     
     AUDIO_URL = "https://raw.githubusercontent.com/tadiparthis/News/main/thank_you_lord.mp3"
     
+    # AUDIO WITH SMOOTH FADE-IN (3s) AND FADE-OUT AT 45 SECONDS
     st.markdown(f"""
-        <audio autoplay controls style="width: 100%; margin-bottom: 20px;">
+        <audio id="reveal-audio" autoplay controls style="width: 100%; margin-bottom: 20px;">
             <source src="{AUDIO_URL}#t=52" type="audio/mp3">
-            Your browser does not support the audio element.
         </audio>
+        <script>
+            const audio = document.getElementById('reveal-audio');
+            audio.volume = 0;
+            
+            // Fade in over 3 seconds
+            let fadeIn = setInterval(() => {{
+                if (audio.volume < 0.95) {{
+                    audio.volume += 0.05;
+                }} else {{
+                    audio.volume = 1.0;
+                    clearInterval(fadeIn);
+                }}
+            }}, 150);
+
+            // Trigger fade out starting at 40 seconds, completed by 45s
+            setTimeout(() => {{
+                let fadeOut = setInterval(() => {{
+                    if (audio.volume > 0.05) {{
+                        audio.volume -= 0.05;
+                    }} else {{
+                        audio.volume = 0;
+                        audio.pause();
+                        clearInterval(fadeOut);
+                    }}
+                }}, 250);
+            }}, 40000);
+        </script>
     """, unsafe_allow_html=True)
     
     st.markdown("""
         <div class="big-announcement">
             🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br><br>
-            <span style="font-size: 24px; color: #111111; font-weight: bold;">
+            <span style="font-size: 21px; color: #111111; font-weight: bold;">
                 You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
             </span><br><br>
-            <span style="font-size: 20px; color: #222222; font-weight: 600;">
+            <span style="font-size: 18px; color: #222222; font-weight: 600;">
                 Expected Arrival: [Insert Due Date Here]
             </span>
         </div>
     """, unsafe_allow_html=True)
     
     st.write("")
-    # Display 100% crystal clear ultrasound photo
+    # Display 100% crystal clear ultrasound photo full width
     final_img = get_focused_ultrasound(len(QUESTIONS), len(QUESTIONS))
     if final_img:
         st.image(final_img, caption="100% Focused: Our Very First Photo! ❤️", use_container_width=True)
