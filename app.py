@@ -357,8 +357,10 @@ else:
         <div class="big-announcement">
             🎉  WE ARE HAVING A BABY! 👶<br><br>
             <span style="font-size: 21px; color: #111111; font-weight: bold;">
-                You are going to be <b>Great GrandPa & Great GrandMa / GrandPa & GrandMa </b>! ❤️
-                / ATTA & MAMU / ATTA -MS & ATTA -MBA</b>! ❤️
+                You are going to be <b> Great GrandPa & Great GrandMa <b>
+                / GrandPa & GrandMa </b>! ❤️
+                / ATTA & MAMU /
+                <b> ❤️ ATTA -MS & ATTA -MBA </b>! ❤️
             </span><br><br>
             <span style="font-size: 18px; color: #222222; font-weight: 600;">
                 Expected Arrival: March, 2027
