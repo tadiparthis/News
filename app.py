@@ -361,8 +361,8 @@ else:
         <div class="big-announcement">
             🎉  WE ARE HAVING A BABY! 👶<br>
             <span style="font-size: 18px; color: #111111; font-weight: bold;">
-                You are going to be <b>Great GrandPa & Great GrandMa<br> 
-                GrandMA & GrandPa<b> Atta & Mamu <b> Pinni -MS & Pinni MBA <b> </b>! ❤️
+                You are going to be <br>Great GrandPa & Great GrandMa
+                <br>GrandMa & GrandPa //<b> Atta & Mamu //<b> <br>Pinni -MS & Pinni MBA <b> </b>! ❤️
             </span><br>
             <span style="font-size: 15px; color: #222222; font-weight: 600;">
                 Expected Arrival: March, 2027
