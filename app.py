@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import time
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageFilter
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="The Family Mystery Challenge", page_icon="🎁", layout="centered")
@@ -75,7 +75,6 @@ QUESTIONS = [
 SUCCESS_GIF  = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTAxOHB2b2VycTZwbW9hcXk1cGwyeW56eGdodW5wa2FoOXl6dzB4eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DffShiJ47fPqM/giphy.gif"
 THINKING_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTdwOHM4dHJmZmVxNnJmeGtnemQ3aDJocGh2Z2N5OTU3NzhhM2FnaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eKrgVyZ7zLvJrgZNZn/giphy.gif"
 
-# Palette of mask colors
 MASK_COLORS = [
     (220, 50, 47),   # Deep Crimson
     (211, 84, 0),    # Burnt Orange
@@ -92,6 +91,8 @@ if "step" not in st.session_state:
     st.session_state.step = 0
 if "feedback" not in st.session_state:
     st.session_state.feedback = None
+if "revealed_at_end" not in st.session_state:
+    st.session_state.revealed_at_end = False
 
 current_step = st.session_state.step
 
@@ -101,7 +102,12 @@ current_watermark = QUESTIONS[current_step]["watermark"] if current_step < len(Q
 # --- INJECT CUSTOM STYLING ---
 st.markdown(f"""
     <style>
-    /* High contrast black text globally */
+    .block-container {{
+        padding-top: 1.5rem !important;
+        padding-bottom: 1rem !important;
+        max-width: 700px !important;
+    }}
+    
     html, body, [class*="css"], .stMarkdown, p, div, label, span {{
         color: #000000 !important;
         font-weight: 600;
@@ -111,14 +117,13 @@ st.markdown(f"""
         background: #ffffff;
     }}
     
-    /* Watermark styling */
     .stApp::before {{
         content: "{current_watermark}";
         position: fixed;
         top: 40%;
         left: 50%;
         transform: translate(-50%, -50%) rotate(-15deg);
-        font-size: clamp(60px, 12vw, 130px);
+        font-size: clamp(50px, 10vw, 100px);
         font-weight: 900;
         color: rgba(200, 0, 0, 0.03);
         text-transform: uppercase;
@@ -127,43 +132,47 @@ st.markdown(f"""
         z-index: 0;
     }}
     
-    /* Question Header Size */
-    .question-title {{
-        font-size: 32px !important;
-        font-weight: 800 !important;
-        color: #000000 !important;
-        margin-top: 10px;
-        margin-bottom: 10px;
+    h1 {{
+        font-size: 26px !important;
+        padding: 0px !important;
+        margin-bottom: -10px !important;
     }}
     
-    /* Radio Options */
+    .question-title {{
+        font-size: 25px !important;
+        font-weight: 800 !important;
+        color: #000000 !important;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        line-height: 1.25 !important;
+    }}
+    
     .stRadio label {{
-        font-size: 27px !important;
+        font-size: 21px !important;
         font-weight: 700 !important;
         color: #000000 !important;
-        padding: 4px 0px;
+        padding: 1px 0px !important;
     }}
 
     .stRadio p {{
-        font-size: 27px !important;
+        font-size: 21px !important;
         font-weight: 700 !important;
         color: #000000 !important;
     }}
     
-    /* SUBMIT BUTTON */
     .stButton > button,
     div[data-testid="stFormSubmitButton"] > button,
     div[data-testid="stFormSubmitButton"] button p {{
         background-color: #ffffff !important;
         background: #ffffff !important;
         color: #000000 !important;
-        font-size: 24px !important;
+        font-size: 20px !important;
         font-weight: 800 !important;
-        border-radius: 10px !important;
-        padding: 8px 20px !important;
+        border-radius: 8px !important;
+        padding: 5px 15px !important;
         width: 100% !important;
-        border: 3px solid #000000 !important;
-        box-shadow: 2px 3px 6px rgba(0,0,0,0.15) !important;
+        border: 2.5px solid #000000 !important;
+        box-shadow: 1px 2px 4px rgba(0,0,0,0.12) !important;
     }}
     
     .stButton > button:hover,
@@ -178,12 +187,10 @@ st.markdown(f"""
         border-color: #000000 !important;
     }}
     
-    /* Tighten white space */
     .stMarkdown {{
-        margin-bottom: -10px;
+        margin-bottom: -12px !important;
     }}
     
-    /* Fix image container sizing */
     [data-testid="stImage"] {{
         width: 100% !important;
         display: flex !important;
@@ -192,56 +199,60 @@ st.markdown(f"""
     
     [data-testid="stImage"] img {{
         width: 100% !important;
-        max-width: 600px !important;
-        height: auto !important;
-        border-radius: 12px;
+        max-width: 420px !important;
+        max-height: 280px !important;
+        object-fit: contain !important;
+        border-radius: 10px;
         border: 2px solid #ddd;
     }}
     
-    /* Announcement Box */
     .big-announcement {{
-        font-size: 29px;
+        font-size: 24px;
         font-weight: bold;
         color: #d90429 !important;
         text-align: center;
-        border: 4px dashed #d90429;
-        padding: 20px;
-        border-radius: 15px;
+        border: 3px dashed #d90429;
+        padding: 12px;
+        border-radius: 12px;
         background-color: #fff0f3;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# Function to dynamically pixelate & mask image so it's completely unidentifiable at early stages
-def get_masked_ultrasound(step, max_steps):
+# Function to dynamically mask ultrasound image based on stage
+def get_masked_ultrasound(step, force_clear=False):
     img_path = "ultrasound.jpg"
     if os.path.exists(img_path):
         try:
             image = Image.open(img_path).convert("RGBA")
             w, h = image.size
             
-            # If we reached the final step, show true 100% clear unmasked image
-            if step >= max_steps:
+            # 1. Force clear reveal at the end after pause
+            if force_clear:
                 return image.convert("RGB")
             
-            # Pixel size sequence: Starts huge (120px blocks) so image is completely unreadable
-            pixel_sizes = [120, 80, 50, 32, 20, 12, 6, 2]
-            pixel_size = pixel_sizes[min(step, len(pixel_sizes)-1)]
+            # 2. Questions 1 through 6: HEAVILY Blurred, Pixelated and Masked (Unreadable)
+            if step < 6:
+                pixel_size = 100
+                small_w, small_h = max(1, w // pixel_size), max(1, h // pixel_size)
+                pixelated = image.resize((small_w, small_h), resample=Image.NEAREST).resize((w, h), resample=Image.NEAREST)
+                pixelated = pixelated.filter(ImageFilter.GaussianBlur(15))
+                
+                overlay = Image.new("RGBA", (w, h), MASK_COLORS[step % len(MASK_COLORS)] + (220,))
+                return Image.alpha_composite(pixelated, overlay).convert("RGB")
             
-            # 1. Block Pixelation
-            small_w = max(1, w // pixel_size)
-            small_h = max(1, h // pixel_size)
-            pixelated = image.resize((small_w, small_h), resample=Image.NEAREST).resize((w, h), resample=Image.NEAREST)
+            # 3. Question 7 & 8: Brought partially into perspective
+            elif step == 6:  # Question 7
+                pixelated = image.resize((max(1, w//16), max(1, h//16)), resample=Image.NEAREST).resize((w, h), resample=Image.NEAREST)
+                overlay = Image.new("RGBA", (w, h), MASK_COLORS[6] + (140,))
+                return Image.alpha_composite(pixelated, overlay).convert("RGB")
             
-            # 2. Color Tint Mask
-            remaining_ratio = (max_steps - step) / max_steps
-            opacity = 0.85 * remaining_ratio
-            color_rgb = MASK_COLORS[step % len(MASK_COLORS)]
-            
-            overlay = Image.new("RGBA", (w, h), color_rgb + (int(255 * opacity),))
-            masked_image = Image.alpha_composite(pixelated, overlay)
-            
-            return masked_image.convert("RGB")
+            elif step == 7:  # Question 8 (Final Question)
+                pixelated = image.resize((max(1, w//8), max(1, h//8)), resample=Image.NEAREST).resize((w, h), resample=Image.NEAREST)
+                overlay = Image.new("RGBA", (w, h), MASK_COLORS[7] + (80,))
+                return Image.alpha_composite(pixelated, overlay).convert("RGB")
+                
+            return image.convert("RGB")
             
         except Exception as e:
             st.error(f"Error loading image: {e}")
@@ -250,14 +261,13 @@ def get_masked_ultrasound(step, max_steps):
 
 # --- GUI HEADER ---
 st.title("🧩 The Family Mystery Challenge")
-st.markdown("<p style='margin-bottom: -5px; font-size: 18px;'>Solve the riddles to reveal the secret image!</p>", unsafe_allow_html=True)
+st.markdown("<p style='margin-bottom: 2px; font-size: 15px;'>Solve the riddles to reveal the secret image!</p>", unsafe_allow_html=True)
 
 # --- GAME LOGIC ---
 if current_step < len(QUESTIONS):
     # Progress Bar
     progress = (current_step) / len(QUESTIONS)
     st.progress(progress)
-    st.caption(f"Progress: Level {current_step + 1} of {len(QUESTIONS)}")
 
     # Display Current Question
     q_data = QUESTIONS[current_step]
@@ -278,25 +288,23 @@ if current_step < len(QUESTIONS):
     # Display GIFs with temporary 2-second timeout
     if st.session_state.feedback == "wrong":
         st.error(f"Incorrect! Hint: {q_data['hint']}")
-        st.image(THINKING_GIF, caption="Hmm... try another option!", width=260)
+        st.image(THINKING_GIF, caption="Hmm... try another option!", width=200)
         time.sleep(2)
         st.session_state.feedback = None
         st.rerun()
 
     elif st.session_state.feedback == "correct":
         st.success("Correct! Moving to the next level...")
-        st.image(SUCCESS_GIF, caption="Great job!", width=260)
+        st.image(SUCCESS_GIF, caption="Great job!", width=200)
         time.sleep(2)
         st.session_state.feedback = None
         st.session_state.step += 1
         st.rerun()
 
-    # Show pixelated color-masked image preview below
-    masked_img = get_masked_ultrasound(current_step, len(QUESTIONS))
+    # Show preview image below
+    masked_img = get_masked_ultrasound(current_step)
     if masked_img:
-        reveal_pct = (current_step / len(QUESTIONS)) * 100
-        st.write("### 🔍 Mystery Preview:")
-        st.image(masked_img, caption=f"Unmask Progress: {reveal_pct:.0f}% Revealed", use_container_width=True)
+        st.image(masked_img, caption=f"Level {current_step + 1} of {len(QUESTIONS)} — Unmasking Mystery Image...", use_container_width=True)
     else:
         st.warning("⚠️ Please place your 'ultrasound.jpg' file in the app folder to display the reveal picture.")
 
@@ -309,25 +317,19 @@ else:
     
     # AUDIO PLAYER WITH FADE-IN (0-3s) AND FADE-OUT AT 45 SECONDS
     st.components.v1.html(f"""
-        <audio id="reveal-audio" controls style="width: 100%;">
+        <audio id="reveal-audio" controls style="width: 100%; height: 40px;">
             <source src="{AUDIO_URL}#t=52" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
         <script>
             const audio = document.getElementById('reveal-audio');
-            
             if (audio) {{
                 audio.volume = 0.0;
-                
-                // Attempt autoplay
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {{
-                    playPromise.catch(() => {{
-                        console.log("Autoplay blocked by browser. User must click play manually.");
-                    }});
+                    playPromise.catch(() => {{ console.log("Autoplay blocked by browser."); }});
                 }}
 
-                // 1. Smooth Fade-In over 3 seconds (0% to 100% volume)
                 let fadeInInterval = setInterval(() => {{
                     if (audio.volume < 0.95) {{
                         audio.volume = Math.min(1.0, audio.volume + 0.05);
@@ -337,7 +339,6 @@ else:
                     }}
                 }}, 150);
 
-                // 2. Smooth Fade-Out starting at 40s, ending at 45s (0% volume & paused)
                 setTimeout(() => {{
                     let fadeOutInterval = setInterval(() => {{
                         if (audio.volume > 0.05) {{
@@ -348,32 +349,43 @@ else:
                             clearInterval(fadeOutInterval);
                         }}
                     }}, 250);
-                }}, 40000); // Trigger fade-out 40s after screen loads (reaches 0 by 45s)
+                }}, 40000);
             }}
         </script>
-    """, height=80)
+    """, height=50)
     
     st.markdown("""
         <div class="big-announcement">
-            🎉  WE ARE HAVING A BABY! 👶<br><br>
-            <span style="font-size: 21px; color: #111111; font-weight: bold;">
-                You are going to be <b> Great GrandPa & Great GrandMa <br>
-                / GrandPa & GrandMa </b>! ❤️
-                / ATTA & MAMU /
-                <b> ❤️ PINNI -MS & PINNI -MBA </b>! ❤️
-            </span><br><br>
-            <span style="font-size: 18px; color: #222222; font-weight: 600;">
-                Expected Arrival: March, 2027
+            🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br>
+            <span style="font-size: 18px; color: #111111; font-weight: bold;">
+                You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
+            </span><br>
+            <span style="font-size: 15px; color: #222222; font-weight: 600;">
+                Expected Arrival: [Insert Due Date Here]
             </span>
         </div>
     """, unsafe_allow_html=True)
     
     st.write("")
-    # Display 100% unmasked crystal clear ultrasound photo full width
-    final_img = get_masked_ultrasound(len(QUESTIONS), len(QUESTIONS))
-    if final_img:
-        st.image(final_img, caption="100% Unmasked: Our Very First Photo! ❤️", use_container_width=True)
+    
+    # Placeholder for image to enable 6-second delay reveal
+    img_container = st.empty()
+    
+    if not st.session_state.revealed_at_end:
+        # Show heavily blurred teaser first while on reveal screen
+        blurred_img = get_masked_ultrasound(current_step=0, force_clear=False)
+        img_container.image(blurred_img, caption="Revealing the picture in a few seconds...", use_container_width=True)
+        
+        # Spend 6 seconds on the final screen before displaying the full unmasked picture
+        time.sleep(6)
+        st.session_state.revealed_at_end = True
+        st.rerun()
     else:
-        st.warning("⚠️ Make sure 'ultrasound.jpg' is located in the same directory as this script.")
+        # Display 100% unmasked clear ultrasound photo
+        final_img = get_masked_ultrasound(current_step=len(QUESTIONS), force_clear=True)
+        if final_img:
+            img_container.image(final_img, caption="100% Clear: Our Very First Photo! ❤️", use_container_width=True)
+        else:
+            st.warning("⚠️ Make sure 'ultrasound.jpg' is located in the same directory as this script.")
         
     st.stop()
