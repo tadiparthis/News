@@ -359,9 +359,11 @@ else:
     
     st.markdown("""
         <div class="big-announcement">
-            🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br>
+            🎉  WE ARE HAVING A BABY! 👶<br>
             <span style="font-size: 18px; color: #111111; font-weight: bold;">
-                You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
+                You are going to be <b>Great GrandPa & Great GrandMa <br>
+                <b>GrandPa & GrandMa / ATTA & MAMU </b>! 
+                <br>❤️PINNI -MS <b>vPINNI -MBA❤️
             </span><br>
             <span style="font-size: 15px; color: #222222; font-weight: 600;">
                 Expected Arrival: [Insert Due Date Here]
