@@ -359,14 +359,12 @@ else:
     
     st.markdown("""
         <div class="big-announcement">
-            🎉  WE ARE HAVING A BABY! 👶<br>
+            🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br>
             <span style="font-size: 18px; color: #111111; font-weight: bold;">
-                You are going to be <b>Great GrandPa & Great GrandMa <br>
-                <b>GrandPa & GrandMa / ATTA & MAMU </b>! 
-                <br>❤️PINNI -MS <b>PINNI -MBA❤️
+                You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
             </span><br>
             <span style="font-size: 15px; color: #222222; font-weight: 600;">
-                Expected Arrival: March, 2027
+                Expected Arrival: [Insert Due Date Here]
             </span>
         </div>
     """, unsafe_allow_html=True)
@@ -377,8 +375,11 @@ else:
     
     if not st.session_state.revealed_at_end:
         # Show heavily blurred teaser first while on reveal screen
-        blurred_img = get_masked_ultrasound(current_step=0, force_clear=False)
-        img_container.image(blurred_img, caption="Revealing the picture in a few seconds...", use_container_width=True)
+        blurred_img = get_masked_ultrasound(0, force_clear=False)
+        if blurred_img:
+            img_container.image(blurred_img, caption="Revealing the picture in a few seconds...", use_container_width=True)
+        else:
+            st.warning("⚠️ Make sure 'ultrasound.jpg' is in your repository root folder.")
         
         # Spend 6 seconds on the final screen before displaying the full unmasked picture
         time.sleep(6)
@@ -386,7 +387,7 @@ else:
         st.rerun()
     else:
         # Display 100% unmasked clear ultrasound photo
-        final_img = get_masked_ultrasound(current_step=len(QUESTIONS), force_clear=True)
+        final_img = get_masked_ultrasound(len(QUESTIONS), force_clear=True)
         if final_img:
             img_container.image(final_img, caption="100% Clear: Our Very First Photo! ❤️", use_container_width=True)
         else:
