@@ -86,12 +86,20 @@ current_step = st.session_state.step
 # Determine current watermark text
 current_watermark = QUESTIONS[current_step]["watermark"] if current_step < len(QUESTIONS) else "GRANDCHILD!"
 
-# --- INJECT DYNAMIC BACKGROUND WATERMARK CSS ---
+# --- INJECT DYNAMIC BACKGROUND WATERMARK & DARK TEXT CSS ---
 st.markdown(f"""
     <style>
-    .stApp {{
-        background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92));
+    /* Force overall high-contrast black text on body elements */
+    html, body, [class*="css"], .stMarkdown, p, div, label, span, h1, h2, h3, h4, h5, h6 {{
+        color: #000000 !important;
+        font-weight: 500;
     }}
+    
+    .stApp {{
+        background: #ffffff;
+    }}
+    
+    /* Watermark text styling */
     .stApp::before {{
         content: "{current_watermark}";
         position: fixed;
@@ -100,26 +108,39 @@ st.markdown(f"""
         transform: translate(-50%, -50%) rotate(-15deg);
         font-size: clamp(60px, 12vw, 130px);
         font-weight: 900;
-        color: rgba(217, 4, 41, 0.08);
+        color: rgba(200, 0, 0, 0.05); /* Very light watermark to keep text easily readable */
         text-transform: uppercase;
         pointer-events: none;
         white-space: nowrap;
         z-index: 0;
     }}
-    .stButton>button {{
-        background-color: #ff4b4b;
-        color: white;
-        font-size: 18px;
-        border-radius: 10px;
-        padding: 8px 24px;
-        width: 100%;
+    
+    /* Bold and readable radio option labels */
+    .stRadio label {{
+        font-size: 19px !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
     }}
+    
+    /* Bright red submit button with thick white text */
+    .stButton>button {{
+        background-color: #d90429 !important;
+        color: #ffffff !important;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        border-radius: 10px;
+        padding: 10px 24px;
+        width: 100%;
+        border: none;
+    }}
+    
+    /* Grand Reveal Box Styling */
     .big-announcement {{
-        font-size: 30px;
+        font-size: 32px;
         font-weight: bold;
-        color: #d90429;
+        color: #d90429 !important;
         text-align: center;
-        border: 3px dashed #d90429;
+        border: 4px dashed #d90429;
         padding: 25px;
         border-radius: 15px;
         background-color: #fff0f3;
@@ -189,13 +210,12 @@ else:
     st.progress(1.0)
     st.balloons()
     
-    # AUDIO EMED WITH TIMESTAMP JUMP TO CHORUS (#t=42 jumps straight to the chorus!)
-    # Replace 'YOUR_AUDIO_URL_HERE.mp3' with your direct MP3 link (e.g. hosted on GitHub/AWS/Dropbox direct link)
-    AUDIO_URL = "https://your-hosted-audio-link.com/thank_you_lord.mp3"
+    # AUDIO EMBED WITH TIMESTAMP JUMP TO CHORUS (#t=52 jumps straight to the chorus!)
+    AUDIO_URL = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/thank_you_lord.mp3"
     
     st.markdown(f"""
         <audio autoplay controls style="width: 100%; margin-bottom: 20px;">
-            <source src="{AUDIO_URL}#t=52" type="audio/mp3">
+            <source src="{AUDIO_URL}#t=42" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
     """, unsafe_allow_html=True)
@@ -203,10 +223,10 @@ else:
     st.markdown("""
         <div class="big-announcement">
             🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br><br>
-            <span style="font-size: 22px; color: #333;">
+            <span style="font-size: 24px; color: #111111; font-weight: bold;">
                 You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
             </span><br><br>
-            <span style="font-size: 18px; color: #555;">
+            <span style="font-size: 20px; color: #222222; font-weight: 600;">
                 Expected Arrival: [Insert Due Date Here]
             </span>
         </div>
