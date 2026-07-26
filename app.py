@@ -109,7 +109,7 @@ st.markdown(f"""
         transform: translate(-50%, -50%) rotate(-15deg);
         font-size: clamp(60px, 12vw, 130px);
         font-weight: 900;
-        color: rgba(200, 0, 0, 0.15);
+        color: rgba(200, 0, 0, 0.03);
         text-transform: uppercase;
         pointer-events: none;
         white-space: nowrap;
@@ -131,22 +131,38 @@ st.markdown(f"""
         color: #000000 !important;
         padding: 6px 0px;
     }}
-    
-    /* Submit Button: WHITE background with BLACK text */
-    .stButton>button {{
-        background-color: #ffffff !important;
+
+    .stRadio p {{
+        font-size: 30px !important;
+        font-weight: 700 !important;
         color: #000000 !important;
-        font-size: 26px !important;
+    }}
+    
+    /* FORCE SUBMIT BUTTON TO STAY PURE WHITE WITH BLACK TEXT AT ALL TIMES */
+    .stButton > button,
+    div[data-testid="stFormSubmitButton"] > button,
+    div[data-testid="stFormSubmitButton"] button p {{
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 28px !important;
         font-weight: 800 !important;
         border-radius: 12px !important;
         padding: 12px 28px !important;
         width: 100% !important;
         border: 3px solid #000000 !important;
-        box-shadow: 2px 4px 8px rgba(0,0,0,0.15);
+        box-shadow: 2px 4px 8px rgba(0,0,0,0.15) !important;
     }}
     
-    .stButton>button:hover {{
-        background-color: #ffffff !important;
+    /* Keep white background on hover, focus, or active click */
+    .stButton > button:hover,
+    .stButton > button:focus,
+    .stButton > button:active,
+    div[data-testid="stFormSubmitButton"] > button:hover,
+    div[data-testid="stFormSubmitButton"] > button:focus,
+    div[data-testid="stFormSubmitButton"] > button:active {{
+        background-color: #f2f2f2 !important;
+        background: #f2f2f2 !important;
         color: #000000 !important;
         border-color: #000000 !important;
     }}
