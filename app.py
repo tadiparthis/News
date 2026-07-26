@@ -12,7 +12,7 @@ QUESTIONS = [
         "q": "Question 1: Sun brings its energy through one of the nuclear processes?",
         "options": ["Nuclear Fission", "Nuclear Fusion", "Nuclear Fashion", "Nuclear Focus"],
         "correct_options": ["Nuclear Fusion"],
-        "hint": "It splits atoms to generate energy!",
+        "hint": "It fuses two to make bigger one ",
         "watermark": "Grand Dad"
     },
     {
