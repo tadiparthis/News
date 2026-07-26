@@ -118,7 +118,7 @@ st.markdown(f"""
     
     /* Make Question Header Large & Bold */
     .question-title {{
-        font-size: 38px !important;
+        font-size: 34px !important;
         font-weight: 800 !important;
         color: #000000 !important;
         margin-bottom: 15px;
