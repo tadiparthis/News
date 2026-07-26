@@ -102,9 +102,10 @@ current_watermark = QUESTIONS[current_step]["watermark"] if current_step < len(Q
 # --- INJECT CUSTOM STYLING ---
 st.markdown(f"""
     <style>
+    /* Restore Top Container Padding so headers don't vanish */
     .block-container {{
-        padding-top: 1.5rem !important;
-        padding-bottom: 1rem !important;
+        padding-top: 3rem !important;
+        padding-bottom: 2rem !important;
         max-width: 700px !important;
     }}
     
@@ -120,7 +121,7 @@ st.markdown(f"""
     .stApp::before {{
         content: "{current_watermark}";
         position: fixed;
-        top: 40%;
+        top: 45%;
         left: 50%;
         transform: translate(-50%, -50%) rotate(-15deg);
         font-size: clamp(50px, 10vw, 100px);
@@ -132,30 +133,32 @@ st.markdown(f"""
         z-index: 0;
     }}
     
+    /* Clear Visible Title Styling */
     h1 {{
-        font-size: 26px !important;
-        padding: 0px !important;
-        margin-bottom: -10px !important;
+        font-size: 28px !important;
+        padding-top: 10px !important;
+        margin-bottom: 0px !important;
+        color: #000000 !important;
     }}
     
     .question-title {{
-        font-size: 25px !important;
+        font-size: 24px !important;
         font-weight: 800 !important;
         color: #000000 !important;
-        margin-top: 5px;
-        margin-bottom: 5px;
+        margin-top: 8px;
+        margin-bottom: 8px;
         line-height: 1.25 !important;
     }}
     
     .stRadio label {{
-        font-size: 21px !important;
+        font-size: 20px !important;
         font-weight: 700 !important;
         color: #000000 !important;
-        padding: 1px 0px !important;
+        padding: 2px 0px !important;
     }}
 
     .stRadio p {{
-        font-size: 21px !important;
+        font-size: 20px !important;
         font-weight: 700 !important;
         color: #000000 !important;
     }}
@@ -166,10 +169,10 @@ st.markdown(f"""
         background-color: #ffffff !important;
         background: #ffffff !important;
         color: #000000 !important;
-        font-size: 20px !important;
+        font-size: 19px !important;
         font-weight: 800 !important;
         border-radius: 8px !important;
-        padding: 5px 15px !important;
+        padding: 6px 15px !important;
         width: 100% !important;
         border: 2.5px solid #000000 !important;
         box-shadow: 1px 2px 4px rgba(0,0,0,0.12) !important;
@@ -188,7 +191,7 @@ st.markdown(f"""
     }}
     
     .stMarkdown {{
-        margin-bottom: -12px !important;
+        margin-bottom: -5px !important;
     }}
     
     [data-testid="stImage"] {{
@@ -199,15 +202,15 @@ st.markdown(f"""
     
     [data-testid="stImage"] img {{
         width: 100% !important;
-        max-width: 420px !important;
-        max-height: 280px !important;
+        max-width: 400px !important;
+        max-height: 260px !important;
         object-fit: contain !important;
         border-radius: 10px;
         border: 2px solid #ddd;
     }}
     
     .big-announcement {{
-        font-size: 24px;
+        font-size: 23px;
         font-weight: bold;
         color: #d90429 !important;
         text-align: center;
@@ -261,7 +264,7 @@ def get_masked_ultrasound(step, force_clear=False):
 
 # --- GUI HEADER ---
 st.title("🧩 The Family Mystery Challenge")
-st.markdown("<p style='margin-bottom: 2px; font-size: 15px;'>Solve the riddles to reveal the secret image!</p>", unsafe_allow_html=True)
+st.markdown("<p style='margin-bottom: 5px; font-size: 15px;'>Solve the riddles to reveal the secret image!</p>", unsafe_allow_html=True)
 
 # --- GAME LOGIC ---
 if current_step < len(QUESTIONS):
@@ -288,14 +291,14 @@ if current_step < len(QUESTIONS):
     # Display GIFs with temporary 2-second timeout
     if st.session_state.feedback == "wrong":
         st.error(f"Incorrect! Hint: {q_data['hint']}")
-        st.image(THINKING_GIF, caption="Hmm... try another option!", width=200)
+        st.image(THINKING_GIF, caption="Hmm... try another option!", width=180)
         time.sleep(2)
         st.session_state.feedback = None
         st.rerun()
 
     elif st.session_state.feedback == "correct":
         st.success("Correct! Moving to the next level...")
-        st.image(SUCCESS_GIF, caption="Great job!", width=200)
+        st.image(SUCCESS_GIF, caption="Great job!", width=180)
         time.sleep(2)
         st.session_state.feedback = None
         st.session_state.step += 1
@@ -368,7 +371,6 @@ else:
     
     st.write("")
     
-    # Placeholder for image to enable 6-second delay reveal
     img_container = st.empty()
     
     if not st.session_state.revealed_at_end:
