@@ -307,8 +307,51 @@ else:
     
     AUDIO_URL = "https://raw.githubusercontent.com/tadiparthis/News/main/thank_you_lord.mp3"
     
-    # SINGLE CLEAN AUDIO PLAYER
-    st.audio(AUDIO_URL, format="audio/mp3", start_time=52, autoplay=True)
+    # AUDIO PLAYER WITH FADE-IN (0-3s) AND FADE-OUT AT 45 SECONDS
+    st.components.v1.html(f"""
+        <audio id="reveal-audio" controls style="width: 100%;">
+            <source src="{AUDIO_URL}#t=52" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        <script>
+            const audio = document.getElementById('reveal-audio');
+            
+            if (audio) {{
+                audio.volume = 0.0;
+                
+                // Attempt autoplay
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {{
+                    playPromise.catch(() => {{
+                        console.log("Autoplay blocked by browser. User must click play manually.");
+                    }});
+                }}
+
+                // 1. Smooth Fade-In over 3 seconds (0% to 100% volume)
+                let fadeInInterval = setInterval(() => {{
+                    if (audio.volume < 0.95) {{
+                        audio.volume = Math.min(1.0, audio.volume + 0.05);
+                    }} else {{
+                        audio.volume = 1.0;
+                        clearInterval(fadeInInterval);
+                    }}
+                }}, 150);
+
+                // 2. Smooth Fade-Out starting at 40s, ending at 45s (0% volume & paused)
+                setTimeout(() => {{
+                    let fadeOutInterval = setInterval(() => {{
+                        if (audio.volume > 0.05) {{
+                            audio.volume = Math.max(0.0, audio.volume - 0.05);
+                        }} else {{
+                            audio.volume = 0.0;
+                            audio.pause();
+                            clearInterval(fadeOutInterval);
+                        }}
+                    }}, 250);
+                }}, 40000); // Trigger fade-out 40s after screen loads (reaches 0 by 45s)
+            }}
+        </script>
+    """, height=80)
     
     st.markdown("""
         <div class="big-announcement">
