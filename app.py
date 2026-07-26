@@ -108,7 +108,7 @@ st.markdown(f"""
         transform: translate(-50%, -50%) rotate(-15deg);
         font-size: clamp(60px, 12vw, 130px);
         font-weight: 900;
-        color: rgba(200, 0, 0, 0.05);
+        color: rgba(200, 0, 0, 0.15);
         text-transform: uppercase;
         pointer-events: none;
         white-space: nowrap;
