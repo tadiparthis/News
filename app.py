@@ -115,7 +115,7 @@ st.markdown(f"""
         z-index: 0;
     }}
     
-    /* Question Header Size (Reduced down to 32px) */
+    /* Question Header Size */
     .question-title {{
         font-size: 32px !important;
         font-weight: 800 !important;
@@ -124,7 +124,7 @@ st.markdown(f"""
         margin-bottom: 10px;
     }}
     
-    /* Radio Options (Reduced down to 27px) */
+    /* Radio Options */
     .stRadio label {{
         font-size: 27px !important;
         font-weight: 700 !important;
@@ -138,7 +138,7 @@ st.markdown(f"""
         color: #000000 !important;
     }}
     
-    /* SUBMIT BUTTON (Reduced down to 24px font size & reduced padding) */
+    /* SUBMIT BUTTON */
     .stButton > button,
     div[data-testid="stFormSubmitButton"] > button,
     div[data-testid="stFormSubmitButton"] button p {{
@@ -154,7 +154,6 @@ st.markdown(f"""
         box-shadow: 2px 3px 6px rgba(0,0,0,0.15) !important;
     }}
     
-    /* Keep white background on hover, focus, or active click */
     .stButton > button:hover,
     .stButton > button:focus,
     .stButton > button:active,
@@ -167,16 +166,24 @@ st.markdown(f"""
         border-color: #000000 !important;
     }}
     
-    /* Tighten white space around headers & dividers */
+    /* Tighten white space */
     .stMarkdown {{
         margin-bottom: -10px;
     }}
     
-    /* Image full container responsiveness */
+    /* Fix image container sizing */
+    [data-testid="stImage"] {{
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+    }}
+    
     [data-testid="stImage"] img {{
-        max-width: 100% !important;
+        width: 100% !important;
+        max-width: 600px !important;
         height: auto !important;
-        border-radius: 10px;
+        border-radius: 12px;
+        border: 2px solid #ddd;
     }}
     
     /* Announcement Box */
@@ -197,14 +204,18 @@ st.markdown(f"""
 def get_focused_ultrasound(step, max_steps):
     img_path = "ultrasound.jpg"
     if os.path.exists(img_path):
-        image = Image.open(img_path)
-        blur_radius = max(0, (max_steps - step) * 3.5)
-        if blur_radius > 0:
-            return image.filter(ImageFilter.GaussianBlur(blur_radius))
-        return image
+        try:
+            image = Image.open(img_path).convert("RGB")
+            blur_radius = max(0, (max_steps - step) * 3.5)
+            if blur_radius > 0:
+                return image.filter(ImageFilter.GaussianBlur(blur_radius))
+            return image
+        except Exception as e:
+            st.error(f"Error loading image: {e}")
+            return None
     return None
 
-# --- GUI HEADER (Tightened spacing) ---
+# --- GUI HEADER ---
 st.title("🧩 The Family Mystery Challenge")
 st.markdown("<p style='margin-bottom: -5px; font-size: 18px;'>Solve the riddles to reveal the secret image!</p>", unsafe_allow_html=True)
 
@@ -252,6 +263,8 @@ if current_step < len(QUESTIONS):
     if focused_img:
         st.write("### 🔍 Mystery Preview:")
         st.image(focused_img, caption=f"Focus Level: {(current_step/len(QUESTIONS))*100:.0f}%", use_container_width=True)
+    else:
+        st.warning("⚠️ Please place your 'ultrasound.jpg' file in the app folder to display the reveal picture.")
 
 # --- FINAL REVEAL SCREEN ---
 else:
@@ -260,48 +273,18 @@ else:
     
     AUDIO_URL = "https://raw.githubusercontent.com/tadiparthis/News/main/thank_you_lord.mp3"
     
-    # AUDIO WITH SMOOTH FADE-IN (3s) AND FADE-OUT AT 45 SECONDS
-    st.markdown(f"""
-        <audio id="reveal-audio" autoplay controls style="width: 100%; margin-bottom: 20px;">
-            <source src="{AUDIO_URL}#t=52" type="audio/mp3">
-        </audio>
-        <script>
-            const audio = document.getElementById('reveal-audio');
-            audio.volume = 0;
-            
-            // Fade in over 3 seconds
-            let fadeIn = setInterval(() => {{
-                if (audio.volume < 0.95) {{
-                    audio.volume += 0.05;
-                }} else {{
-                    audio.volume = 1.0;
-                    clearInterval(fadeIn);
-                }}
-            }}, 150);
-
-            // Trigger fade out starting at 40 seconds, completed by 45s
-            setTimeout(() => {{
-                let fadeOut = setInterval(() => {{
-                    if (audio.volume > 0.05) {{
-                        audio.volume -= 0.05;
-                    }} else {{
-                        audio.volume = 0;
-                        audio.pause();
-                        clearInterval(fadeOut);
-                    }}
-                }}, 250);
-            }}, 40000);
-        </script>
-    """, unsafe_allow_html=True)
+    # SINGLE CLEAN AUDIO PLAYER (Prevents double audio playing)
+    st.audio(AUDIO_URL, format="audio/mp3", start_time=52, autoplay=True)
     
     st.markdown("""
         <div class="big-announcement">
-            🎉 SURPRISE! WE ARE HAVING A BABY! 👶<br><br>
+            🎉  WE ARE HAVING A BABY! 👶<br><br>
             <span style="font-size: 21px; color: #111111; font-weight: bold;">
-                You are going to be <b>DADA & DADI / NANA & NANI</b>! ❤️
+                You are going to be <b>Great GrandPa & Great GrandMa / NANA & NANI/ </b>! ❤️
+                ATTA & MAMU / GrandMa & GrandPa / MS - ATTA & MBA- ATTA / </b>! ❤️
             </span><br><br>
             <span style="font-size: 18px; color: #222222; font-weight: 600;">
-                Expected Arrival: [Insert Due Date Here]
+                Expected Arrival: March, 2027
             </span>
         </div>
     """, unsafe_allow_html=True)
@@ -311,3 +294,7 @@ else:
     final_img = get_focused_ultrasound(len(QUESTIONS), len(QUESTIONS))
     if final_img:
         st.image(final_img, caption="100% Focused: Our Very First Photo! ❤️", use_container_width=True)
+    else:
+        st.warning("⚠️ Make sure 'ultrasound.jpg' is located in the same directory as this script.")
+        
+    st.stop()
