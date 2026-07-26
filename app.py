@@ -8,59 +8,65 @@ st.set_page_config(page_title="The Family Mystery Challenge", page_icon="🎁", 
 # --- MULTIPLE CHOICE QUESTIONS SETUP ---
 QUESTIONS = [
     {
-        "q": "Question 1 (Bible): According to Psalm 127:3, children are a gift and a blessing from whom?",
-        "options": ["The King", "The Lord / God", "The Neighbors", "The Mayor"],
-        "correct": "The Lord / God",
-        "hint": "They are a divine blessing from above!",
+        "q": "Question 1: In a Nuclear Power Plant, what type of reaction occurs to split atoms?",
+        "options": ["Nuclear Fission", "Nuclear Fusion", "Nuclear Fashion", "Nuclear Focus"],
+        "correct_options": ["Nuclear Fission"],
+        "hint": "It splits atoms to generate energy!",
         "watermark": "Nibling"
     },
     {
-        "q": "Question 2 (Math): In standard math, 1 + 1 = 2. But in family math, 1 + 1 = ?",
-        "options": ["2", "3", "0", "10"],
-        "correct": "3",
-        "hint": "Two parents plus a new addition!",
+        "q": "Question 2: If you can crack this formula, you have a big clue hidden in the options! What is (a+b)²?",
+        "options": ["a^2+b^2+2ab", "ay+by", "ba+by+2ab", "ba+ay+4ab"],
+        "correct_options": ["a^2+b^2+2ab"],
+        "hint": "A squared plus B squared plus 2AB!",
         "watermark": "Mom"
     },
     {
-        "q": "Question 3 (Physics): What high-frequency sound wave do doctors use to take the very first photo inside the womb?",
+        "q": "Question 3: At what high sound frequencies can dogs hear that humans cannot?",
         "options": ["Micro-wave", "Radio wave", "Ultrasound", "Infrared"],
-        "correct": "Ultrasound",
+        "correct_options": ["Ultrasound"],
         "hint": "It starts with 'Ultra'!",
         "watermark": "Dad"
     },
     {
-        "q": "Question 4 (Bible): Which famous baby in the Old Testament was saved in a basket floating on the Nile River?",
+        "q": "Question 4: Which famous baby in the Old Testament was saved in a basket floating on the Nile River?",
         "options": ["Moses", "David", "Solomon", "Noah"],
-        "correct": "Moses",
+        "correct_options": ["Moses"],
         "hint": "He grew up to lead his people!",
         "watermark": "Nani"
     },
     {
-        "q": "Question 5 (Physics/Math): What happens to matter when heat is added—does it contract or expand?",
-        "options": ["Contract", "Expand", "Disappear", "Freeze"],
-        "correct": "Expand",
+        "q": "Question 5: In Genesis 1:28, God blessed mankind and commanded them to do what?",
+        "options": ["Divide", "Preach", "Multiply", "Heal"],
+        "correct_options": ["Multiply"],
         "hint": "Think about things growing bigger!",
         "watermark": "Nana"
     },
     {
-        "q": "Question 6 (General): What tiny, soft footwear is usually sold in pairs for very small feet?",
-        "options": ["Hiking Boots", "Baby Booties", "High Heels", "Flip Flops"],
-        "correct": "Baby Booties",
-        "hint": "Way too small for an adult!",
+        "q": "Question 6: According to the promise, Israel is a land flowing with ___ and honey?",
+        "options": ["Wine", "Water", "MILK", "Olives"],
+        "correct_options": ["MILK"],
+        "hint": "White in color!",
         "watermark": "Dadi"
     },
     {
-        "q": "Question 7 (Family): What new title do parents get when a new generation arrives?",
-        "options": ["Dada & Dadi / Nana & Nani", "Captain", "Professor", "Neighbor"],
-        "correct": "Dada & Dadi / Nana & Nani",
+        "q": "Question 7: According to Psalm 127:3, children are:",
+        "options": [
+            "A temporary responsibility, not a gift", 
+            "A test from man, a punishment from God", 
+            "A burden for parents, a curse for families", 
+            "A heritage from the Lord, a reward from Him"
+        ],
+        "correct_options": ["A heritage from the Lord, a reward from Him"],
         "hint": "The best promotion in the family!",
         "watermark": "Granddaughter"
     },
     {
-        "q": "Question 8 (FINAL): Combine all clues: Ultrasound + 1+1=3 + Baby Booties + Grandparent Promotion = ?",
-        "options": ["New Car", "Vacation", "WE ARE HAVING A BABY!", "Pet Cat"],
-        "correct": "WE ARE HAVING A BABY!",
-        "hint": "Choose the biggest news!",
+        "q": "Question 8 (FINAL): If you remember all the answers, what does it all boil down to?",
+        "options": ["Increasing", "Multiply", "A Ba Be", "Unto us... WE ARE HAVING A BABY!"],
+        # ALL options are marked as correct so any pick triggers the grand finale!
+        "correct_options": ["Increasing", "Multiply", "A Ba Be", "Unto us... WE ARE HAVING A BABY!"],
+        "hint": "Pick any option to see the big reveal!",
         "watermark": "BABY IS COMING!"
     }
 ]
@@ -119,7 +125,7 @@ st.markdown(f"""
         background-color: #fff0f3;
     }}
     </style>
-""", unsafe_unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Function to dynamically blur ultrasound image based on progress
 def get_focused_ultrasound(step, max_steps):
@@ -155,7 +161,8 @@ if current_step < len(QUESTIONS):
         submit_button = st.form_submit_button(label="Submit Answer")
 
     if submit_button:
-        if selected_option == q_data["correct"]:
+        # Check against list of accepted answers for current question
+        if selected_option in q_data["correct_options"]:
             st.session_state.feedback = "correct"
             st.session_state.step += 1
             st.rerun()
@@ -181,6 +188,17 @@ if current_step < len(QUESTIONS):
 else:
     st.progress(1.0)
     st.balloons()
+    
+    # AUDIO EMED WITH TIMESTAMP JUMP TO CHORUS (#t=42 jumps straight to the chorus!)
+    # Replace 'YOUR_AUDIO_URL_HERE.mp3' with your direct MP3 link (e.g. hosted on GitHub/AWS/Dropbox direct link)
+    AUDIO_URL = "https://your-hosted-audio-link.com/thank_you_lord.mp3"
+    
+    st.markdown(f"""
+        <audio autoplay controls style="width: 100%; margin-bottom: 20px;">
+            <source src="{AUDIO_URL}#t=52" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
         <div class="big-announcement">
