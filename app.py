@@ -117,7 +117,7 @@ st.markdown(f"""
     
     /* Make Question Header Large & Bold */
     .question-title {{
-        font-size: 28px !important;
+        font-size: 38px !important;
         font-weight: 800 !important;
         color: #000000 !important;
         margin-bottom: 15px;
@@ -125,7 +125,7 @@ st.markdown(f"""
     
     /* Make Radio Options Large & Easy to Read */
     .stRadio label {{
-        font-size: 22px !important;
+        font-size: 30px !important;
         font-weight: 700 !important;
         color: #000000 !important;
         padding: 6px 0px;
@@ -135,7 +135,7 @@ st.markdown(f"""
     .stButton>button {{
         background-color: #ffffff !important;
         color: #000000 !important;
-        font-size: 22px !important;
+        font-size: 26px !important;
         font-weight: 800 !important;
         border-radius: 12px !important;
         padding: 12px 28px !important;
@@ -145,7 +145,7 @@ st.markdown(f"""
     }}
     
     .stButton>button:hover {{
-        background-color: #f0f0f0 !important;
+        background-color: #ffffff !important;
         color: #000000 !important;
         border-color: #000000 !important;
     }}
