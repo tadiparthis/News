@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import time
 from PIL import Image, ImageFilter
 
 # --- PAGE CONFIGURATION ---
@@ -64,7 +65,6 @@ QUESTIONS = [
     {
         "q": "Question 8 (FINAL): If you remember all the answers, what does it all boil down to?",
         "options": ["Increasing", "Multiply", "A Ba Be", "Unto us... WE ARE HAVING A BABY!"],
-        # ALL options are marked as correct so any pick triggers the grand finale!
         "correct_options": ["Increasing", "Multiply", "A Ba Be", "Unto us... WE ARE HAVING A BABY!"],
         "hint": "Pick any option to see the big reveal!",
         "watermark": "BABY IS COMING!"
@@ -86,20 +86,20 @@ current_step = st.session_state.step
 # Determine current watermark text
 current_watermark = QUESTIONS[current_step]["watermark"] if current_step < len(QUESTIONS) else "GRANDCHILD!"
 
-# --- INJECT DYNAMIC BACKGROUND WATERMARK & DARK TEXT CSS ---
+# --- INJECT CUSTOM STYLING (DARKER & BIGGER FONTS, WHITE BUTTON) ---
 st.markdown(f"""
     <style>
-    /* Force overall high-contrast black text on body elements */
-    html, body, [class*="css"], .stMarkdown, p, div, label, span, h1, h2, h3, h4, h5, h6 {{
+    /* High contrast black text globally */
+    html, body, [class*="css"], .stMarkdown, p, div, label, span {{
         color: #000000 !important;
-        font-weight: 500;
+        font-weight: 600;
     }}
     
     .stApp {{
         background: #ffffff;
     }}
     
-    /* Watermark text styling */
+    /* Watermark styling */
     .stApp::before {{
         content: "{current_watermark}";
         position: fixed;
@@ -108,33 +108,49 @@ st.markdown(f"""
         transform: translate(-50%, -50%) rotate(-15deg);
         font-size: clamp(60px, 12vw, 130px);
         font-weight: 900;
-        color: rgba(200, 0, 0, 0.05); /* Very light watermark to keep text easily readable */
+        color: rgba(200, 0, 0, 0.05);
         text-transform: uppercase;
         pointer-events: none;
         white-space: nowrap;
         z-index: 0;
     }}
     
-    /* Bold and readable radio option labels */
+    /* Make Question Header Large & Bold */
+    .question-title {{
+        font-size: 28px !important;
+        font-weight: 800 !important;
+        color: #000000 !important;
+        margin-bottom: 15px;
+    }}
+    
+    /* Make Radio Options Large & Easy to Read */
     .stRadio label {{
-        font-size: 19px !important;
+        font-size: 22px !important;
         font-weight: 700 !important;
         color: #000000 !important;
+        padding: 6px 0px;
     }}
     
-    /* Bright red submit button with thick white text */
+    /* Submit Button: WHITE background with BLACK text */
     .stButton>button {{
-        background-color: #d90429 !important;
-        color: #ffffff !important;
-        font-size: 20px !important;
-        font-weight: bold !important;
-        border-radius: 10px;
-        padding: 10px 24px;
-        width: 100%;
-        border: none;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        border-radius: 12px !important;
+        padding: 12px 28px !important;
+        width: 100% !important;
+        border: 3px solid #000000 !important;
+        box-shadow: 2px 4px 8px rgba(0,0,0,0.15);
     }}
     
-    /* Grand Reveal Box Styling */
+    .stButton>button:hover {{
+        background-color: #f0f0f0 !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+    }}
+    
+    /* Announcement Box */
     .big-announcement {{
         font-size: 32px;
         font-weight: bold;
@@ -153,7 +169,6 @@ def get_focused_ultrasound(step, max_steps):
     img_path = "ultrasound.jpg"
     if os.path.exists(img_path):
         image = Image.open(img_path)
-        # Calculate blur radius (Level 0 = Blur 25, Level 7 = Blur 2, Final = Blur 0)
         blur_radius = max(0, (max_steps - step) * 3.5)
         if blur_radius > 0:
             return image.filter(ImageFilter.GaussianBlur(blur_radius))
@@ -172,9 +187,9 @@ if current_step < len(QUESTIONS):
     st.progress(progress)
     st.caption(f"Progress: Level {current_step + 1} of {len(QUESTIONS)}")
 
-    # Display Current Question
+    # Display Current Question (Extra Large Font)
     q_data = QUESTIONS[current_step]
-    st.subheader(q_data["q"])
+    st.markdown(f'<div class="question-title">{q_data["q"]}</div>', unsafe_allow_html=True)
     
     # Form with Radio Options
     with st.form(key=f"form_{current_step}"):
@@ -182,22 +197,27 @@ if current_step < len(QUESTIONS):
         submit_button = st.form_submit_button(label="Submit Answer")
 
     if submit_button:
-        # Check against list of accepted answers for current question
         if selected_option in q_data["correct_options"]:
             st.session_state.feedback = "correct"
-            st.session_state.step += 1
-            st.rerun()
         else:
             st.session_state.feedback = "wrong"
+        st.rerun()
 
-    # Display GIFs & Blurred Image Progress
+    # Display GIFs with temporary 2-second timeout
     if st.session_state.feedback == "wrong":
         st.error(f"Incorrect! Hint: {q_data['hint']}")
         st.image(THINKING_GIF, caption="Hmm... try another option!", width=260)
-    elif st.session_state.feedback == "correct":
-        st.success("Correct! The mystery picture is getting clearer...")
-        st.image(SUCCESS_GIF, caption="Great job!", width=260)
+        time.sleep(2)
         st.session_state.feedback = None
+        st.rerun()
+
+    elif st.session_state.feedback == "correct":
+        st.success("Correct! Moving to the next level...")
+        st.image(SUCCESS_GIF, caption="Great job!", width=260)
+        time.sleep(2)
+        st.session_state.feedback = None
+        st.session_state.step += 1
+        st.rerun()
 
     # Show gradually focusing image preview below
     focused_img = get_focused_ultrasound(current_step, len(QUESTIONS))
@@ -210,12 +230,11 @@ else:
     st.progress(1.0)
     st.balloons()
     
-    # AUDIO EMBED WITH TIMESTAMP JUMP TO CHORUS (#t=52 jumps straight to the chorus!)
-    AUDIO_URL = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/thank_you_lord.mp3"
+    AUDIO_URL = "https://raw.githubusercontent.com/tadiparthis/News/main/thank_you_lord.mp3"
     
     st.markdown(f"""
         <audio autoplay controls style="width: 100%; margin-bottom: 20px;">
-            <source src="{AUDIO_URL}#t=42" type="audio/mp3">
+            <source src="{AUDIO_URL}#t=52" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
     """, unsafe_allow_html=True)
