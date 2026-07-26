@@ -75,7 +75,7 @@ QUESTIONS = [
 SUCCESS_GIF  = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTAxOHB2b2VycTZwbW9hcXk1cGwyeW56eGdodW5wa2FoOXl6dzB4eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DffShiJ47fPqM/giphy.gif"
 THINKING_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTdwOHM4dHJmZmVxNnJmeGtnemQ3aDJocGh2Z2N5OTU3NzhhM2FnaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eKrgVyZ7zLvJrgZNZn/giphy.gif"
 
-# Palette of mask colors that cycle through the levels
+# Palette of mask colors
 MASK_COLORS = [
     (220, 50, 47),   # Deep Crimson
     (211, 84, 0),    # Burnt Orange
@@ -212,29 +212,35 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# Function to dynamically mask ultrasound image with fading color overlays
+# Function to dynamically pixelate & mask image so it's completely unidentifiable at early stages
 def get_masked_ultrasound(step, max_steps):
     img_path = "ultrasound.jpg"
     if os.path.exists(img_path):
         try:
             image = Image.open(img_path).convert("RGBA")
+            w, h = image.size
             
             # If we reached the final step, show true 100% clear unmasked image
             if step >= max_steps:
                 return image.convert("RGB")
             
-            # Mask Opacity decreases gradually from 0.90 (90%) down to 0%
-            remaining_steps = max_steps - step
-            opacity = min(0.92, max(0.1, (remaining_steps / max_steps) * 0.92))
+            # Pixel size sequence: Starts huge (120px blocks) so image is completely unreadable
+            pixel_sizes = [120, 80, 50, 32, 20, 12, 6, 2]
+            pixel_size = pixel_sizes[min(step, len(pixel_sizes)-1)]
             
-            # Pick mask color for current question
+            # 1. Block Pixelation
+            small_w = max(1, w // pixel_size)
+            small_h = max(1, h // pixel_size)
+            pixelated = image.resize((small_w, small_h), resample=Image.NEAREST).resize((w, h), resample=Image.NEAREST)
+            
+            # 2. Color Tint Mask
+            remaining_ratio = (max_steps - step) / max_steps
+            opacity = 0.85 * remaining_ratio
             color_rgb = MASK_COLORS[step % len(MASK_COLORS)]
             
-            # Create color overlay layer
-            overlay = Image.new("RGBA", image.size, color_rgb + (int(255 * opacity),))
+            overlay = Image.new("RGBA", (w, h), color_rgb + (int(255 * opacity),))
+            masked_image = Image.alpha_composite(pixelated, overlay)
             
-            # Blend original image with color mask
-            masked_image = Image.alpha_composite(image, overlay)
             return masked_image.convert("RGB")
             
         except Exception as e:
@@ -285,12 +291,12 @@ if current_step < len(QUESTIONS):
         st.session_state.step += 1
         st.rerun()
 
-    # Show color-masked image preview below
+    # Show pixelated color-masked image preview below
     masked_img = get_masked_ultrasound(current_step, len(QUESTIONS))
     if masked_img:
-        fade_pct = (current_step / len(QUESTIONS)) * 100
+        reveal_pct = (current_step / len(QUESTIONS)) * 100
         st.write("### 🔍 Mystery Preview:")
-        st.image(masked_img, caption=f"Color Mask Faded: {fade_pct:.0f}% Revealed", use_container_width=True)
+        st.image(masked_img, caption=f"Unmask Progress: {reveal_pct:.0f}% Revealed", use_container_width=True)
     else:
         st.warning("⚠️ Please place your 'ultrasound.jpg' file in the app folder to display the reveal picture.")
 
