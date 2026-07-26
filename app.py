@@ -126,7 +126,7 @@ st.markdown(f"""
         transform: translate(-50%, -50%) rotate(-15deg);
         font-size: clamp(50px, 10vw, 100px);
         font-weight: 900;
-        color: rgba(200, 0, 0, 0.15);
+        color: rgba(200, 0, 0, 0.10);
         text-transform: uppercase;
         pointer-events: none;
         white-space: nowrap;
